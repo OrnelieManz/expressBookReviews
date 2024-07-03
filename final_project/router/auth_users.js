@@ -72,7 +72,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
         let username=req.body.username;
         let review=req.body.review;
-        book['review'][username]=review;
+        book['reviews'][username]=review;
         books[isbn]=book
         res.send(`Your review for book ${isbn} is added.`);
     }else {
@@ -80,6 +80,20 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     }
   
   //return res.status(300).json({message: "Yet to be implemented"});
+});
+
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+
+    const isbn=req.params.isbn
+    let book =books[isbn]
+    let username=req.body.username
+
+    if (book) {
+
+        delete books[isbn]['reviews'][username]
+    }
+
+    res.send(`Review for book ${isbn} by ${username} has been deleted.`)
 });
 
 module.exports.authenticated = regd_users;
