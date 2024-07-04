@@ -39,19 +39,24 @@ public_users.post("/register", (req,res) => {
   //return res.status(300).json({message: "Yet to be implemented"});
 });
 
-// Get the book list available in the shop
-public_users.get('/',function (req, res) {
-    const outcome=axios.get("booksdetails.json");
-    outcome.then(resp=> {
-        // Storing the response data in the courseDetails variable
-        let booksdetail=resp.data;
-        res.send(JSON.stringify(booksdetail,null,4));
-    })
-    .catch(err => {
-        // Logging the error message
-        console.log(err.toString());
-        // This will console log the error with the code. e.g., Error: Request failed with status code 404
+const connectandgetData = async(data)=>{
+    const outcome = axios.get(url);
+    let listOfWork = (await outcome).data.work;
+    listOfWork.forEach((work)=>{
+      console.log(work.titleAuth);
     });
+} 
+
+// Get the book list available in the shop
+public_users.get('/', async(req, res) => {
+
+    try {
+        const resp=await axios.get("booksdetails.json"); 
+        return res.json(resp.data);
+    }
+    catch (err) {
+        console.log(err)
+    }
     // Handling the promise rejection
   //return res.status(300).json({message: "Yet to be implemented"});
 });
