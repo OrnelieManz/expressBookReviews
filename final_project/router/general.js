@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios').default;
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -40,9 +41,19 @@ public_users.post("/register", (req,res) => {
 
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  
+    const outcome=axios.get("booksdetails.json");
+    outcome.then(resp=> {
+        // Storing the response data in the courseDetails variable
+        let booksdetail=resp.data;
+        res.send(JSON.stringify(booksdetail,null,4));
+    })
+    .catch(err => {
+        // Logging the error message
+        console.log(err.toString());
+        // This will console log the error with the code. e.g., Error: Request failed with status code 404
+    });
+    // Handling the promise rejection
   //return res.status(300).json({message: "Yet to be implemented"});
-  res.send(JSON.stringify(books,null,4))
 });
 
 // Get book details based on ISBN
