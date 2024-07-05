@@ -3,6 +3,7 @@ const axios = require('axios').default;
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
+let datalink="https://raw.githubusercontent.com/OrnelieManz/expressBookReviews/main/final_project/router/booksdetails.json";
 const public_users = express.Router();
 
 const deepObjFilter = (pred) => (o) => Object .fromEntries (
@@ -39,52 +40,60 @@ public_users.post("/register", (req,res) => {
   //return res.status(300).json({message: "Yet to be implemented"});
 });
 
-const connectandgetData = async(data)=>{
-    const outcome = axios.get(url);
-    let listOfWork = (await outcome).data.work;
-    listOfWork.forEach((work)=>{
-      console.log(work.titleAuth);
-    });
-} 
-
 // Get the book list available in the shop
 public_users.get('/', async(req, res) => {
 
-    try {
-        const resp=await axios.get("booksdetails.json"); 
-        return res.json(resp.data);
-    }
-    catch (err) {
-        console.log(err)
-    }
-    // Handling the promise rejection
-  //return res.status(300).json({message: "Yet to be implemented"});
+    //get data from github repo
+    const outcome=axios.get(datalink);
+    let response=(await outcome).data;
+    
+    //send response
+    res.send(response);
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn',async (req, res) => {
 
     const isbn=req.params.isbn
-    res.send(books[isbn])
-    //return res.status(300).json({message: "Yet to be implemented"});
+    
+    //get data from github repo
+    const outcome=axios.get(datalink);
+    let response=(await outcome).data;
+    
+    //send response
+    res.send(response[isbn]);
+    
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author', async (req, res)=> {
     
     const author=req.params.author
     const filterByauthor = (author) => deepObjFilter (o => o.author === author)
-    let filtered_byauthor=filterByauthor(author)(books)
-    res.send(filtered_byauthor)
-    //return res.status(300).json({message: "Yet to be implemented"});
+
+    //get data from github repo
+    const outcome=axios.get(datalink);
+    let response=(await outcome).data;
+
+    //filter the books list by author
+    let filtered_byauthor=filterByauthor(author)(response);
+    //send response
+    res.send(filtered_byauthor);
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async (req, res) =>{
     const title=req.params.title
     const filterBytitle = (title) => deepObjFilter (o => o.title === title)
-    let filtered_bytitle=filterBytitle(title)(books)
-    res.send(filtered_bytitle)
+
+    //get data from github repo
+    const outcome=axios.get(datalink);
+    let response=(await outcome).data;
+
+    //filter the books list by title
+    let filtered_bytitle=filterBytitle(title)(books);
+    //send response
+    res.send(filtered_bytitle);
   
   //return res.status(300).json({message: "Yet to be implemented"});
 });
